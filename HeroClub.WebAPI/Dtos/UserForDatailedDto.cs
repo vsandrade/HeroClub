@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
 
-namespace HeroClub.Domain
+namespace HeroClub.WebAPI.Dtos
 {
-    public class User : IdentityUser<int>
-    {        
+    public class UserForDatailedDto
+    {
+        public int Id { get; set; }
+        public string Username { get; set; }
         public string Gender { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        public int Age { get; set; }
         public string KnownAs { get; set; }
         public DateTime Created { get; set; }
         public DateTime LastActive { get; set; }
@@ -16,9 +17,7 @@ namespace HeroClub.Domain
         public string Interests { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
-        public ICollection<Foto> Fotos { get; set; }
-        public Heroi Heroi { get; set; }
-        public int HeroiId { get; set; }
-        public ICollection<UserRole> UserRoles { get; set; }
+        public string PhotoUrl { get; set; }
+        public ICollection<FotoForDatailedDto> Fotos { get; set; }
     }
 }

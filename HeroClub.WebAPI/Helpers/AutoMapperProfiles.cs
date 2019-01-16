@@ -15,6 +15,9 @@ namespace HeroClub.WebAPI.Helpers
             CreateMap<EquipeHeroi, EquipeHeroiDto>();
             CreateMap<Foto, FotoDto>();
             CreateMap<Heroi, HeroiDto>();
+            CreateMap<User, UserForListDto>();
+            CreateMap<User, UserForLoginDto>();
+            CreateMap<User, UserForRegisterDto>();
         }
     }
 }

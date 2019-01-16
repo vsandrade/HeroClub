@@ -3,11 +3,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using HeroClub.Domain;
 using HeroClub.Repository;
 using HeroClub.WebAPI.Dtos;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,49 +21,70 @@ namespace HeroClub.WebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public IAuthRepository _repo { get; }
-        public IConfiguration _config { get; }
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private readonly IConfiguration _config;
+        private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+
+        public AuthController(IConfiguration config,
+            IMapper mapper,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _mapper = mapper;
             _config = config;
-            _repo = repo;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
-            //Because we are using [ApiController] before the Controller Name, We don't need:
-            //if(!ModelState.IsValid)
-            //  return BadRequest(ModelState);
-            //And, We don't need to specify [FromBody] before the post methods parameters.            
+            var userToCreate = _mapper.Map<User>(userForRegisterDto);
 
-            userForRegisterDto.UserName = userForRegisterDto.UserName.ToLower();
+            var result = await _userManager.CreateAsync(userToCreate, userForRegisterDto.Password);
 
-            if (await _repo.UserExists(userForRegisterDto.UserName))
-                return BadRequest("UserName already exists");
+            var userToReturn = _mapper.Map<UserForDatailedDto>(userToCreate);
 
-            var userToCreate = new User
+            if (result.Succeeded)
             {
-                UserName = userForRegisterDto.UserName
-            };
+                return CreatedAtRoute("GetUser", 
+                    new { controller = "Users", id = userToCreate.Id }, userToReturn);                
+            }
 
-            var CreatedUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
-
-            return StatusCode(201);
+            return BadRequest(result.Errors);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserForLoginDto userForLogin)
-        {            
-            var userFromRepo = await _repo.Login(userForLogin.Username.ToLower(), userForLogin.Password);
+        public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
+        {
+            var user = await _userManager.FindByNameAsync(userForLoginDto.Username);
 
-            if (userFromRepo == null)
-                return Unauthorized();
+            var result = await _signInManager.CheckPasswordSignInAsync(user, userForLoginDto.Password, false);
 
+            if (result.Succeeded)
+            {
+                var appUser = await _userManager.Users.Include(p => p.Fotos)
+                    .FirstOrDefaultAsync(u => u.NormalizedUserName == userForLoginDto.Username.ToUpper());
+
+                var userToRetorn = _mapper.Map<UserForListDto>(appUser);
+            
+                return Ok(new
+                {
+                    token = GenerateJwtToken(appUser),
+                    user = userToRetorn
+                });
+            }
+
+            return Unauthorized();
+        }
+
+        public string GenerateJwtToken(User user)
+        {
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
-                new Claim(ClaimTypes.Name, userFromRepo.UserName)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8
@@ -79,9 +103,7 @@ namespace HeroClub.WebAPI.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return Ok(new {
-                token = tokenHandler.WriteToken(token)
-            });
+            return tokenHandler.WriteToken(token);
         }
     }
 }

@@ -68,8 +68,6 @@ namespace HeroClub.WebAPI
             Mapper.Reset();
             services.AddAutoMapper();
 
-            services.AddScoped<HeroClub.Repository.IAuthRepository, AuthRepository>();
-
             services.AddMvc(options =>
             {
                 var policy = new AuthorizationPolicyBuilder()
