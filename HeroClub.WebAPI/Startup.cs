@@ -98,8 +98,8 @@ namespace HeroClub.WebAPI
             }
 
             //app.UseHttpsRedirection();
-            app.UseMvc();
             app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            app.UseMvc();
         }
     }
 }
