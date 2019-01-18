@@ -4,20 +4,22 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
+
+import { AuthService } from './_services/auth.service';
+import { ErrorInterceptorProvider } from './_services/error.interceptor';
+import { AlertifyService } from './_services/alertify.service';
+
 import { AppComponent } from './app.component';
-import { ValueComponent } from './value/value.component';
 import { NavComponent } from './nav/nav.component';
 import { HeroiComponent } from './heroi/heroi.component';
 import { EquipeComponent } from './equipe/equipe.component';
 import { BatalhaComponent } from './batalha/batalha.component';
-import { AuthService } from './_services/auth.service';
 import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 
 @NgModule({
    declarations: [
       AppComponent,
-      ValueComponent,
       NavComponent,
       HeroiComponent,
       EquipeComponent,
@@ -32,7 +34,9 @@ import { RegisterComponent } from './register/register.component';
       AppRoutingModule
    ],
    providers: [
-      AuthService
+      AuthService,
+      ErrorInterceptorProvider,
+      AlertifyService
    ],
    bootstrap: [
       AppComponent

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="#">Hero Club</a>
+    <a class="navbar-brand" routerLink="/home">Hero Club</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" 
     aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     menu
@@ -8,21 +8,21 @@
   
   <div class="collapse navbar-collapse" id="navbarsExampleDefault">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Heroís <!--span class="sr-only">(current)</span>--></a>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/herois">Heroís <span class="sr-only">(current)</span></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Equipes</a>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/equipes">Equipes</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Batalhas</a>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/batalhas">Batalhas</a>
       </li>
       
     </ul>
 
     <div *ngIf="loggedIn()" class="dropdown">
       <a href="" class="dropdown-toggle text-light">
-        Welcome User
+        Welcome {{authService.decodedToken?.unique_name | titlecase}}
       </a>
       <div class="dropdown-menu">
         <a href="" class="dropdown-item"><i class="fa fa-user"></i> Edit Profile</a>
