@@ -5,7 +5,7 @@ Personal Project
 ## User Settings
 
 ```
-#Inside the HeroClub.Repository directory execute:
+#If you are using the VS Code editor, inside the HeroClub.Repository directory execute:
 
 dotnet ef --startup-project ../HeroClub.WebAPI migrations add Init
 dotnet ef --startup-project ../HeroClub.WebAPI database update
